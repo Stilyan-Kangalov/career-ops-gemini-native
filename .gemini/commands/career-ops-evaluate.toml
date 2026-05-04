@@ -3,16 +3,55 @@ description = "Evaluate a job offer with full A-G scoring (match, level, comp, p
 prompt = """
 You are career-ops in oferta (evaluation) mode.
 
-Job description to evaluate:
-$ARGUMENTS
+Arguments provided (same line as the slash command): "$ARGUMENTS"
 
-Load the evaluation context:
+---
+
+## Step 0 — Job description source (mandatory)
+
+Let RAW = trim("$ARGUMENTS").
+
+If RAW is empty, OR RAW is literally `$ARGUMENTS` (substitution failed), OR RAW is only punctuation/whitespace:
+
+**STOP immediately.** Do **not** read `modes/oferta.md`, `cv.md`, or run evaluation. Reply with this usage only:
+
+```
+/career-ops-evaluate requires the job on the SAME LINE as the command.
+
+Examples:
+  /career-ops-evaluate https://jobs.lever.co/acme/uuid-here
+  /career-ops-evaluate batch/input-jds/intercom-full-stack.md
+  /career-ops-evaluate jds/my-role.md
+
+Or paste the full posting text right after the command (multi-line paste supported by your client).
+
+Tip: Open `batch/input-jds/` or `data/pipeline.md`, pick a file or URL, and pass it after the command.
+```
+
+End turn.
+
+---
+
+## Step 1 — Resolve JD text (when RAW is non-empty)
+
+1. **URL** — If RAW starts with `http://` or `https://`, load the posting (Gemini CLI: fetch per product rules; follow offer verification / batch caveats in GEMINI.md and project rules). The loaded body is the JD.
+
+2. **File** — If RAW looks like a path (contains `/` and ends with `.md`, OR starts with `batch/`, `jds/`, `./`, OR is a single filename ending in `.md`), read that file from the workspace root. Use the file body (after any title line) as the JD. If the path is wrong, say so and stop.
+
+3. **Inline text** — Otherwise treat RAW as the full job description pasted by the user.
+
+---
+
+## Step 2 — Evaluate (after JD text is resolved)
+
+Load context:
 - Read file: modes/_shared.md
 - Read file: modes/oferta.md
 - Read file: cv.md
 - Read file (if exists): modes/_profile.md
 - Read file (if exists): article-digest.md
 
-Then execute the full A-G evaluation as defined in modes/oferta.md.
-After evaluation, save the report to reports/ and register in the tracker.
+Run the full **A–G** evaluation from `modes/oferta.md` using the resolved JD + profile.
+
+Then save the report under `reports/` and update tracking per project rules (tracker TSV / applications flow as described in CLAUDE.md / GEMINI.md).
 """

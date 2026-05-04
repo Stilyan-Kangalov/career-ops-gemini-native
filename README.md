@@ -134,6 +134,7 @@ gemini
 # 4. Use slash commands just like Claude Code
 /career-ops "Senior AI Engineer at Anthropic..."
 /career-ops-model gemini-2.0-flash
+/career-ops-generate-jds --max 3
 /career-ops-evaluate --file ./jds/openai.txt
 /career-ops-scan
 /career-ops-pdf
@@ -197,6 +198,24 @@ Tip: You can manage the script model quickly with:
 npm run gemini:model:show
 npm run gemini:model -- gemini-2.0-flash
 ```
+
+#### Token-safe batch setup (recommended)
+
+```bash
+# 1) Discover jobs with zero-token scanner
+npm run scan
+
+# 2) Generate JD files from pending pipeline URLs (default: 3 files)
+npm run jds:generate
+
+# Skip portals.yml title filtering (first N URLs only — higher noise)
+npm run jds:generate -- --no-portals-filter
+
+# 3) Paid tier users can increase the cap
+npm run jds:generate -- --max 10
+```
+
+Then run `/career-ops-batch` in Gemini CLI.
 
 ## Usage
 

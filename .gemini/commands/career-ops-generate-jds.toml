@@ -1,0 +1,17 @@
+description = "Generate batch/input-jds files from pending pipeline URLs (default: max 3)."
+
+prompt = """
+Generate JD files for batch evaluation from `data/pipeline.md`.
+
+Arguments provided: "$ARGUMENTS"
+
+Rules:
+1) If no args provided, run:
+   npm run jds:generate
+2) If args are provided, pass through:
+   npm run jds:generate -- $ARGUMENTS
+3) After running, list generated files in `batch/input-jds/`.
+4) Remind the user:
+   - default max=3 for token safety/free-tier
+   - paid users can increase with `--max` (example: `--max 10`)
+"""

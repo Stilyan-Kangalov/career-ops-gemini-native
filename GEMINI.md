@@ -37,10 +37,13 @@ Parse the JSON output:
 
 When using [Gemini CLI](https://github.com/google-gemini/gemini-cli), the following slash commands are available (defined in `.gemini/commands/`):
 
+**Arguments:** Put URLs, file paths, or pasted text on the **same line** after the command (e.g. `/career-ops-evaluate batch/input-jds/role.md`). A bare `/career-ops-evaluate` leaves no job to score — the command will show usage only.
+
 | Command | Claude Code Equivalent | Description |
 |---------|------------------------|-------------|
 | `/career-ops` | `/career-ops` | Show menu or evaluate JD |
 | `/career-ops-model` | n/a | Set/show Gemini model for `gemini-eval.mjs` |
+| `/career-ops-generate-jds` | n/a | Generate `batch/input-jds` from pending pipeline URLs |
 | `/career-ops-pipeline` | `/career-ops pipeline` | Process pending URLs from inbox |
 | `/career-ops-evaluate` | `/career-ops oferta` | Evaluate job offer (A-G scoring) |
 | `/career-ops-compare` | `/career-ops ofertas` | Compare and rank multiple offers |
@@ -56,7 +59,89 @@ When using [Gemini CLI](https://github.com/google-gemini/gemini-cli), the follow
 | `/career-ops-patterns` | `/career-ops patterns` | Analyze rejection patterns |
 | `/career-ops-followup` | `/career-ops followup` | Follow-up cadence tracker |
 
+### Token-Safe Batch Defaults
+
+- Batch evaluation defaults to **3 roles/files** for free-tier safety.
+- To generate JD files quickly from pending URLs:
+  - `npm run jds:generate` (default max 3; applies `portals.yml` title filtering like `scan.mjs`)
+  - `npm run jds:generate -- --no-portals-filter` (first N URLs — higher noise)
+  - `npm run jds:generate -- --max 10` (paid-tier recommended)
+- Paid users can process more files by explicitly increasing limits.
+
 **All commands share the same evaluation logic** in `modes/*.md`. The `modes/` files are shared between Claude Code, OpenCode, and Gemini CLI.
+
+### Workflow — Gemini CLI (start here)
+
+Think of **three buckets**:
+
+| Bucket | What it is |
+|--------|------------|
+| **Inbox** | `data/pipeline.md` — lines `- [ ] URL \| Company \| Title` = jobs waiting for you |
+| **JD snapshots** | `batch/input-jds/*.md` — posting text saved so Gemini does not refetch blindly |
+| **Outputs** | `reports/*.md` (evaluation writeups), `data/applications.md` (tracker), optional PDFs |
+
+**Default loop (recommended):**
+
+1. **Fill the inbox (no LLM tokens)**  
+   ```bash
+   npm run scan
+   ```  
+   New roles append under **`## Pendientes`** in `data/pipeline.md`.
+
+2. **See what’s waiting**  
+   Open `data/pipeline.md`, or count unchecked lines:  
+   `grep -c '^- \[ \]' data/pipeline.md`
+
+3. **Turn URLs into JD files (terminal only — HTTP; uses `portals.yml` title filter)**  
+   ```bash
+   npm run jds:generate
+   ```  
+   Defaults to **3** files; paid / quota OK → `npm run jds:generate -- --max 10`.  
+   Outputs land in **`batch/input-jds/`**.
+
+4. **Score them (uses API quota)**  
+   - **Inside Gemini CLI chat:** type **`/career-ops-batch`** in the input box and press Enter — **do not** run it as a Shell/bash command (there is no `/career-ops-batch` binary).  
+   - **From the project terminal** (same logic as single-file `gemini-eval.mjs`):  
+     ```bash
+     npm run gemini:eval:batch
+     npm run gemini:eval:batch -- --max 5
+     ```
+
+5. **After batch evaluations**  
+   If your batch wrote tracker TSVs under `batch/tracker-additions/`, run:  
+   `node merge-tracker.mjs`  
+   Keep **`data/applications.md`** aligned with project rules.
+
+**One job at a time (no batch):**
+
+```text
+/career-ops-evaluate batch/input-jds/your-file.md
+```
+
+or paste a URL / JD on the **same line** after the command.
+
+**Quick paste (single shot):**
+
+```text
+/career-ops https://jobs.example.com/...
+```
+
+(or paste JD text after `/career-ops` — same-line arguments.)
+
+**Optional discovery:** `/career-ops-scan` uses WebSearch-style discovery when you drive it from Gemini; **`npm run scan`** is the reliable zero-token pull from ATS APIs.
+
+```mermaid
+flowchart LR
+  subgraph terminal["Terminal — free HTTP"]
+    A["npm run scan"] --> B["data/pipeline.md"]
+    B --> C["npm run jds:generate"]
+    C --> D["batch/input-jds/*.md"]
+  end
+  subgraph gemini["Gemini CLI — quota"]
+    D --> E["/career-ops-batch or /career-ops-evaluate"]
+    E --> F["reports/ + tracker"]
+  end
+```
 
 ## Troubleshooting: API_KEY_INVALID (400)
 

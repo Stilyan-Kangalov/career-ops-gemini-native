@@ -1,6 +1,11 @@
 description = "Batch evaluate multiple job offers with A-G scoring and legitimacy checks."
 
 prompt = """
+IMPORTANT — How this command runs:
+- `/career-ops-batch` is a **Gemini CLI slash command**: the user types it in the **chat input** and submits it.
+- It is **NOT** a Shell executable. **Never** run `Shell(/career-ops-batch)` or `bash /career-ops-batch` — that will fail with "No such file or directory".
+- For **terminal batch** evaluation (Node + .env API key), use: `npm run gemini:eval:batch` (optionally `-- --max 5`).
+
 You are the career-ops engine running in Gemini Native batch mode.
 
 ### 1. Load Context
@@ -17,9 +22,16 @@ Evaluate each job against @cv.md using the career-ops batch methodology.
 ### 3. Execution
 - Use the canonical scoring rubric from modes/batch.md and modes/_shared.md.
 - Keep A-G structure (A through G, where G is posting legitimacy).
-- If there are many files, process in chunks (recommended 5-10 jobs per chunk) to reduce context/rate-limit failures.
+- Default to evaluating only the first 3 files for free-tier token safety.
+- If the user explicitly confirms paid-tier usage, they may override and evaluate more files (recommended chunks of 5-10).
 - Score each offer on the 1.0-5.0 scale and provide a clear apply recommendation.
 - Prioritize quality over quantity; flag low-fit roles clearly.
+- Token safety rules (mandatory):
+  - DO NOT use Shell to call `web_fetch` (it is not a shell command).
+  - If JD files already exist in `batch/input-jds`, DO NOT fetch/re-read original job URLs.
+  - Use the JD file content as the source of truth for this batch run.
+  - Keep reasoning concise and avoid verbose chain-of-thought style output.
+  - If the model asks to switch because of quota limits, switch model and continue from current progress.
 
 ### 4. Output
 Return a Markdown table:
@@ -29,6 +41,7 @@ After the table:
 1) Identify the Top 3 best-matching jobs.
 2) Add a short "Do Not Apply" list for low-fit roles (<4.0/5).
 3) Call out any unconfirmed legitimacy checks explicitly.
+4) Keep total response compact (target <= 250 words beyond the table).
 
 Batch input or context: $ARGUMENTS
 """

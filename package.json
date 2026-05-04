@@ -15,7 +15,10 @@
     "rollback": "node update-system.mjs rollback",
     "liveness": "node check-liveness.mjs",
     "scan": "node scan.mjs",
+    "pipeline:rehydrate": "node rehydrate-pipeline-from-history.mjs",
+    "jds:generate": "node generate-input-jds.mjs",
     "gemini:eval": "node gemini-eval.mjs",
+    "gemini:eval:batch": "node gemini-eval-batch.mjs",
     "gemini:model": "node set-gemini-model.mjs",
     "gemini:model:show": "node set-gemini-model.mjs --show"
   },
