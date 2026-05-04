@@ -1,16 +1,28 @@
-description = "Batch evaluate multiple job offers in parallel using worker agents."
+description = "High-speed batch evaluation of multiple job offers using Gemini's native context."
 
 prompt = """
-You are career-ops in batch mode.
+You are the career-ops engine running in Gemini Native batch mode.
 
-Load the batch context:
+### 1. Load Context
 - Read file: modes/_shared.md
 - Read file: modes/batch.md
 - Read file: cv.md
-- Read file (if exists): modes/_profile.md
+- Read file: (if exists): modes/_profile.md
 
-Then execute the batch mode as defined in modes/batch.md.
-Process multiple offers efficiently and merge results into the tracker.
+### 2. Mission
+I have provided a directory of job descriptions in @data/to-evaluate/. 
+Evaluate every single file in that directory against my @cv.md.
+
+### 3. Execution
+- Use the 10-dimension scoring system from modes/evaluate.md.
+- Process all offers in a single pass to ensure consistency.
+- Assign an A-F score (1.0 to 5.0).
+
+### 4. Output
+Return a Markdown table:
+| File Name | Company | Role | Score | Verdict | Apply? |
+
+Identify the Top 3 best-matching jobs at the end.
 
 Batch input or context: $ARGUMENTS
 """
