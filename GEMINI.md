@@ -40,6 +40,7 @@ When using [Gemini CLI](https://github.com/google-gemini/gemini-cli), the follow
 | Command | Claude Code Equivalent | Description |
 |---------|------------------------|-------------|
 | `/career-ops` | `/career-ops` | Show menu or evaluate JD |
+| `/career-ops-model` | n/a | Set/show Gemini model for `gemini-eval.mjs` |
 | `/career-ops-pipeline` | `/career-ops pipeline` | Process pending URLs from inbox |
 | `/career-ops-evaluate` | `/career-ops oferta` | Evaluate job offer (A-G scoring) |
 | `/career-ops-compare` | `/career-ops ofertas` | Compare and rank multiple offers |
@@ -56,6 +57,30 @@ When using [Gemini CLI](https://github.com/google-gemini/gemini-cli), the follow
 | `/career-ops-followup` | `/career-ops followup` | Follow-up cadence tracker |
 
 **All commands share the same evaluation logic** in `modes/*.md`. The `modes/` files are shared between Claude Code, OpenCode, and Gemini CLI.
+
+## Troubleshooting: API_KEY_INVALID (400)
+
+If `node gemini-eval.mjs` returns:
+
+`API key not valid. Please pass a valid API key.`
+
+Use this checklist:
+
+1. Open `.env` and set a real key:
+   - `GEMINI_API_KEY=your_real_key_here`
+   - Do not leave `your_gemini_api_key_here` (placeholder).
+2. Retry:
+   - `node gemini-eval.mjs --file ./jds/my-job.txt`
+3. Keep auth scope clear:
+   - Gemini CLI slash usage (for example `/career-ops`, `/model`) uses Gemini CLI session auth.
+   - `node gemini-eval.mjs` uses `.env` (`GEMINI_API_KEY`, optional `GEMINI_MODEL`).
+
+Model helper (script flow):
+
+```bash
+npm run gemini:model:show
+npm run gemini:model -- gemini-2.0-flash
+```
 
 ## First Run — Onboarding
 

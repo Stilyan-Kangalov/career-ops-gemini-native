@@ -1,0 +1,18 @@
+description = "Set or show the Gemini model used by gemini-eval.mjs."
+
+prompt = """
+Manage the Gemini model for this repository.
+
+Arguments provided: "$ARGUMENTS"
+
+Rules:
+1) If no arguments were provided, show help with examples:
+   - npm run gemini:model:show
+   - npm run gemini:model -- gemini-2.0-flash
+   - npm run gemini:model -- gemini-1.5-pro
+2) If a model argument was provided, run:
+   npm run gemini:model -- "$ARGUMENTS"
+3) Then run:
+   npm run gemini:model:show
+4) Confirm success and remind the user this affects `node gemini-eval.mjs`.
+"""

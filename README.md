@@ -115,7 +115,7 @@ See [docs/SETUP.md](docs/SETUP.md) for the full setup guide.
 
 ## Gemini CLI Integration
 
-Career-ops supports [Gemini CLI](https://github.com/google-gemini/gemini-cli) natively — the same way it supports Claude Code and OpenCode. All 15 slash commands are available, using the same `modes/*.md` evaluation logic.
+Career-ops supports [Gemini CLI](https://github.com/google-gemini/gemini-cli) natively — the same way it supports Claude Code and OpenCode. All slash commands are available, using the same `modes/*.md` evaluation logic.
 
 ### Option A — Native Gemini CLI (Recommended)
 
@@ -133,13 +133,25 @@ gemini
 
 # 4. Use slash commands just like Claude Code
 /career-ops "Senior AI Engineer at Anthropic..."
+/career-ops-model gemini-2.0-flash
 /career-ops-evaluate --file ./jds/openai.txt
 /career-ops-scan
 /career-ops-pdf
 /career-ops-tracker
 ```
 
-The `GEMINI.md` file is auto-loaded as context. All 15 commands are defined in `.gemini/commands/*.toml`.
+The `GEMINI.md` file is auto-loaded as context. All commands are defined in `.gemini/commands/*.toml`.
+
+You can switch the standalone Gemini evaluator model at any time:
+
+```bash
+# Show current model
+npm run gemini:model:show
+
+# Set model for future gemini-eval runs
+npm run gemini:model -- gemini-2.0-flash
+npm run gemini:model -- gemini-1.5-pro
+```
 
 ### Option B — Standalone API Script (No CLI install needed)
 
@@ -155,9 +167,36 @@ npm install
 node gemini-eval.mjs "We are looking for a Senior AI Engineer..."
 node gemini-eval.mjs --file ./jds/my-job.txt
 npm run gemini:eval -- "JD text here"
+
+# Override model for one run
+node gemini-eval.mjs --model gemini-1.5-pro --file ./jds/my-job.txt
 ```
 
 > **Free tier:** Both options work without billing. Native CLI uses Google OAuth; the API script uses `gemini-2.0-flash` (15 RPM, 1M tokens/day free).
+
+#### Gemini Troubleshooting: `API_KEY_INVALID` (400)
+
+If you see:
+
+`API key not valid. Please pass a valid API key.`
+
+Use this checklist:
+
+1. Open `.env` and set a real key:
+   - `GEMINI_API_KEY=your_real_key_here`
+   - Do not leave `your_gemini_api_key_here` (placeholder).
+2. Retry:
+   - `node gemini-eval.mjs --file ./jds/my-job.txt`
+3. Keep the auth model clear:
+   - Gemini CLI slash usage (`/career-ops`, `/model`) uses Gemini CLI session auth.
+   - `node gemini-eval.mjs` uses `.env` (`GEMINI_API_KEY`, optional `GEMINI_MODEL`).
+
+Tip: You can manage the script model quickly with:
+
+```bash
+npm run gemini:model:show
+npm run gemini:model -- gemini-2.0-flash
+```
 
 ## Usage
 

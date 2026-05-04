@@ -1,4 +1,4 @@
-description = "High-speed batch evaluation of multiple job offers using Gemini's native context."
+description = "Batch evaluate multiple job offers with A-G scoring and legitimacy checks."
 
 prompt = """
 You are the career-ops engine running in Gemini Native batch mode.
@@ -8,21 +8,27 @@ You are the career-ops engine running in Gemini Native batch mode.
 - Read file: modes/batch.md
 - Read file: cv.md
 - Read file: (if exists): modes/_profile.md
+- Read file: (if exists): article-digest.md
 
 ### 2. Mission
-I have provided a directory of job descriptions in @data/to-evaluate/. 
-Evaluate every single file in that directory against my @cv.md.
+I have provided job descriptions in @batch/input-jds/ (or via $ARGUMENTS).
+Evaluate each job against @cv.md using the career-ops batch methodology.
 
 ### 3. Execution
-- Use the 10-dimension scoring system from modes/evaluate.md.
-- Process all offers in a single pass to ensure consistency.
-- Assign an A-F score (1.0 to 5.0).
+- Use the canonical scoring rubric from modes/batch.md and modes/_shared.md.
+- Keep A-G structure (A through G, where G is posting legitimacy).
+- If there are many files, process in chunks (recommended 5-10 jobs per chunk) to reduce context/rate-limit failures.
+- Score each offer on the 1.0-5.0 scale and provide a clear apply recommendation.
+- Prioritize quality over quantity; flag low-fit roles clearly.
 
 ### 4. Output
 Return a Markdown table:
-| File Name | Company | Role | Score | Verdict | Apply? |
+| File Name | Company | Role | Score (A-G) | Legitimacy | Verdict | Apply? |
 
-Identify the Top 3 best-matching jobs at the end.
+After the table:
+1) Identify the Top 3 best-matching jobs.
+2) Add a short "Do Not Apply" list for low-fit roles (<4.0/5).
+3) Call out any unconfirmed legitimacy checks explicitly.
 
 Batch input or context: $ARGUMENTS
 """

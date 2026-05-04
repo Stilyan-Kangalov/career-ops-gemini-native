@@ -16,6 +16,7 @@ career-ops — Command Center
 
 Available commands:
   /career-ops {JD}         → AUTO-PIPELINE: evaluate + report + tracker
+  /career-ops-model        → Set/show Gemini model for gemini-eval
   /career-ops-pipeline     → Process pending URLs from inbox
   /career-ops-evaluate     → Evaluation only A-G (no auto PDF)
   /career-ops-compare      → Compare and rank multiple offers
