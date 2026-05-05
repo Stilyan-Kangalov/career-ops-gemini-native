@@ -68,6 +68,8 @@ const scripts = [
   { name: 'normalize-statuses.mjs', expectExit: 0 },
   { name: 'dedup-tracker.mjs', expectExit: 0 },
   { name: 'merge-tracker.mjs', expectExit: 0 },
+  { name: 'export-html.mjs', expectExit: 0 },
+  { name: 'bin/career-ops.mjs version', expectExit: 0 },
   { name: 'update-system.mjs check', expectExit: 0 },
 ];
 
@@ -174,7 +176,10 @@ for (const f of systemFiles) {
 
 // Check user files are NOT tracked (gitignored)
 const userFiles = [
-  'config/profile.yml', 'modes/_profile.md', 'portals.yml',
+  'config/profile.yml',
+  'modes/_profile.md',
+  'portals.yml',
+  'interview-prep/story-bank.md',
 ];
 for (const f of userFiles) {
   const tracked = run('git', ['ls-files', f]);

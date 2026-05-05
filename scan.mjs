@@ -29,6 +29,19 @@ const APPLICATIONS_PATH = 'data/applications.md';
 // Ensure required directories exist (fresh setup)
 mkdirSync('data', { recursive: true });
 
+const DEFAULT_PIPELINE = `# Pipeline
+
+URLs to evaluate (from scan, or add manually). Process with pipeline mode in Cursor.
+
+## Pendientes
+
+## Procesadas
+`;
+
+if (!existsSync(PIPELINE_PATH)) {
+  writeFileSync(PIPELINE_PATH, DEFAULT_PIPELINE, 'utf-8');
+}
+
 const CONCURRENCY = 10;
 const FETCH_TIMEOUT_MS = 10_000;
 

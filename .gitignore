@@ -24,6 +24,10 @@ batch/input-jds/*
 writing-samples/*
 !writing-samples/README.md
 
+# Interview prep (STAR stories, company intel — user-local)
+interview-prep/*
+!interview-prep/.gitkeep
+
 # User config and customization (never auto-updated)
 config/profile.yml
 portals.yml
@@ -48,4 +52,5 @@ bun.lock
 .claude/settings.local.json
 .claude/memory/
 career-dashboard
+dashboard/dashboard
 package-lock.json
